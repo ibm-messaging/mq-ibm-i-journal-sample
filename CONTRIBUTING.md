@@ -7,7 +7,7 @@ To ensure that the codebase is always healthy and does not result in deployment 
 Therefore, the following steps should be followed to submit your contributions: 
 
 1. Fork the repository
-2. Run test, format
+2. Run tests
 3. Commit/Push changes to your fork
 4. Create a Pull Request 
 
@@ -46,7 +46,7 @@ You should see the URL for your fork as origin, and the URL for our repository a
 
 Now, you can work locally and commit to your changes to your fork. This will not impact the main branch.
 
-### 2. Run tests and format script
+### 2. Run tests
 
 Before committing changes, build on IBM i and run manual tests to ensure that they work with the main codebase. 
 
