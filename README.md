@@ -18,7 +18,7 @@ As time goes on, the information contained in older journal receivers is superse
 
 ## Manual Journal Housekeeping
 
-IBM MQ summarizes all of the information about required journal receivers into a user space object named `AMQJRNINF` in the queue manager library. This user space contains the name and time stamp of the oldest IBM MQ journal receiver information that is required for safe operations and assured startup. 
+IBM MQ writes information about journal receivers that are still needed into a user space object named `AMQJRNINF` in the queue manager library. This user space contains the name and timestamp of the oldest IBM MQ journal receiver information that is required for safe operations and assured startup. 
 
 An MQ administrator can manually check the user space with the IBM i `DSPF` command.  For example, for a queue manager named TEST using library QMTEST, use the command: 
 ```
@@ -26,7 +26,7 @@ DSPF '/QSYS.LIB/QMTEST.LIB/AMQJRNINF.USRSPC'
 ```
 If the QMTEST library is in an iASP, include the iASP name before /QSYS.LIB.
 
-The administrator can then delete receivers older than the one named in the user space (i.e. those with a lower number). However they must be careful to never delete the receiver named in the user space, nor to delete any journal receiver newer (higher numbered) than that. Ths could cause the queue manager to crash or fail to start and could lead to data loss. 
+The administrator can then delete receivers older than the one named in the user space (i.e. those with a lower number). However they must be careful to never delete the receiver named in the user space, nor to delete any journal receiver newer (higher numbered) than that. Ths could cause the queue manager to crash or to fail to start (necessitating assistance from IBM Support to perform a coldstart) and could lead to data loss. 
 
 For more information about manual journal management see: 
 <br>https://www.ibm.com/docs/en/ibm-mq/9.4?topic=data-journal-management-i
@@ -37,13 +37,13 @@ This repository provides a utility program and command which check the queue man
 
 The command invokes a C program which takes the following steps:
 
-1. Read the AMQJRNINF user space object to get timestamp of the oldest journal entry that IBM MQ needs for restart or for media recovery.
+1. Reads the AMQJRNINF user space object to get timestamp of the oldest journal entry that IBM MQ needs for restart or for media recovery.
 
-2. Use an IBM i journal API call (QjoRetrieveJournalInformation) to get the list of receivers that are associated with the queue manager's AMQAJRN journal. Note that the program has been written to handle an arbitrary limit of up to 256 receivers in the receiver chain. While this limit could be changed, it would not be recommended to allow receiver chains to get near this size.
+2. Uses an IBM i journal API call (QjoRetrieveJournalInformation) to get the list of receivers that are associated with the queue manager's AMQAJRN journal. Note that the program has been written to handle an arbitrary limit of up to 256 receivers in the receiver chain. While this limit could be changed, it is not recommended that you allow receiver chains to get near this size.
 
-3. Loop through the list of journal receivers from the newest to the oldest, to determine the receiver that contains the oldest journal entry. This will be the oldest receiver that is needed by the queue manager. To find this receiver, the program compares the timestamp of the oldest journal entry to the time that each receiver was attached to the journal. The program assumes that the receiver that contains the oldest journal entry will be the first journal receiver on the system that was attached before the oldest entry was written
+3. Loops through the list of journal receivers from the newest to the oldest, to determine the receiver that contains the oldest journal entry. This will be the oldest receiver that is needed by the queue manager. To find this receiver, the program compares the timestamp of the oldest journal entry to the time that each receiver was attached to the journal. The first journal receiver the program finds that was attached before the oldest entry was written will contain the oldest journal entry.
 
-4. Loop through the list of receivers from the oldest to the newest. Delete any journal receivers that are older than the one that contains the oldest journal entry.
+4. (Optionally) loops through the list of receivers from the oldest to the newest deleting any journal receivers that are older than the one that contains the oldest journal entry.
 
 For example, in Figure 1, the oldest journal entry we need to keep is the "Media Recovery" entry time stamped 13:09:07. (Note that the timestamps used by the program are in the form CYYMMDDHHMMSSmmm, but we will use HH:MM:SS in this example for the sake of simplicity)
 
@@ -97,14 +97,11 @@ The journal maintenance command (MQJRNMNT) has three parameters. To prompt the c
 
 The parameters are :
 
-
+| Parameter | Option |
+| --- | --- |
 | QMGRLIB | Supply the name of the queue manager library. You can determine the name of the queue manager library by looking in the /QIBM/UserData/mqm/mqs.ini file |
-
-| OUTPUT | *PRINT - Display output to STDOUT (This is the default) 
-           <br>*MSGQ - Send output to queue manager message queue (QMQMMSG in queue manager library) |
-
-| DLTRCV | *NO - Will execute the program in report mode - no receivers will be deleted (This is the default)
-           <br>*YES - ... Will execute the program in report mode - no receivers will be deleted |
+| OUTPUT | *PRINT - Display output to STDOUT (This is the default)<br>*MSGQ - Send output to queue manager message queue (QMQMMSG in queue manager library) |
+| DLTRCV | *NO - Will execute the program in report mode - no receivers will be deleted (This is the default)<br>*YES - ... Will execute the program in report mode - no receivers will be deleted |
 
 Figure 3 shows a sample of the output when the program is run with OUTPUT(*PRINT) and DLTRCV(*YES). The output shows that eleven receivers are associated with AMQAJRN. The timestamp of the oldest entry is 14:05:35 on 27/05/03. This entry is contained within receiver AMQA000008, so receiver AMQA000007 and earlier receivers can be deleted.
 
@@ -112,7 +109,8 @@ Figure 3 shows a sample of the output when the program is run with OUTPUT(*PRINT
 <br>_*Figure 3*_
 
 
-When using MQJRNMNT as part of an automated journal management strategy you should consider periodically recording media images of all your queue manager objects. Consider the following :
+When using MQJRNMNT as part of an automated journal management strategy you should consider periodically recording media images of all your queue manager objects. 
+For example, the following commands...
 
 ```
 CHGJRN JRN(QMGRLIB/AMQAJRN) JRNRCV(*GEN)
@@ -120,11 +118,11 @@ RCDMQMIMG OBJ(*ALL) OBJTYPE(*ALL) MQMNAME(YourQMGR) DSPJRNDTA(*YES)
 MQJRNMNT QMGRLIB(QMGRLIB) DLTRCV(*YES)
 ```
 
-This will generate a new empty journal receiver, record the current media image and checkpoint, then delete any unneeded journal receivers. It would be a good idea to save the journal receivers before deleting them. Consider saving the manager's library or adding logic to the sample C code to save the receivers before the delete.
+...will generate and attach a new empty journal receiver, record the current media image and checkpoint, then delete any unneeded journal receivers. It would be a good idea to save the journal receivers before deleting them. Consider saving the manager's library or adding logic to the sample C code to save the receivers before the delete.
 
-In an ideal situation, the currently attached receiver to the journal should be the oldest receiver required by IBM MQ, but there may be situations where older journal receivers will still be required. If, after the above steps, the oldest required receiver is a significant number of receivers distant from the currently attached receiver then the queue manager may have long-running transactions, or channels in doubt.  Resolving these situations will reduce the number of receivers needed on the system.
+In an ideal situation the oldest receiver required by IBM MQ will be the receiver which is currently attached, but typically a few older journal receivers will be required. However, if the oldest required receiver is a significant number of receivers distant from the currently attached receiver then the queue manager may have long-running transactions, or in-doubt channels.  Resolving these situations will reduce the number of receivers needed on the system.
 
-Note that the journal receivers created by IBM MQ are owned by the QMQM profile, and so the utility MQJRNMNT and all the above commands should run under user profile QMQM or have *ALLOBJ authority for the DLTRCV option to work.
+Note that the journal receivers created by IBM MQ are owned by the QMQM profile, so the utility MQJRNMNT and all the above commands should run under user profile QMQM or have *ALLOBJ authority for the DLTRCV option to work.
 
 
 ## Summary
