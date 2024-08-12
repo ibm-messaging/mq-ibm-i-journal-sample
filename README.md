@@ -68,7 +68,7 @@ CRTSRCPF MQJRNMNT/QCSRC
 CRTSRCPF MQJRNMNT/QCMDSRC
 ```
 
-Transfer the source to your IBM i system. For example to use TP, type the following commands:
+Transfer the source to your IBM i system. For example to use FTP, type the following commands:
 
 ```
 FTP (IBM i hostname)
@@ -80,7 +80,7 @@ PUT mqjrnmaint.cmd QCMDSRC.MQJRNMNT
 QUIT
 ```
 
-Type the following on the IBM i system to compile the program and the command:
+Type the following on the IBM i system to compile the C program and the CL command:
 
 ```
 CRTBNDC MQJRNMNT/JRNMAINT MQJRNMNT/QCSRC
