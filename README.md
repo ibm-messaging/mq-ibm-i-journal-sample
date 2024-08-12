@@ -1,6 +1,8 @@
 # Automating Management of IBM MQ Journal Receivers on IBM i
 
-### Mark Phillips - IBM MQ Development - IBM Hursley <br>Mike Alexander - IBM MQ Development - IBM Rochester <br>Martin Smith - IBM MQ Service - IBM Rochester
+#### Mark Phillips - IBM MQ Development - IBM Hursley 
+#### Mike Alexander - IBM MQ Development - IBM Rochester 
+#### Martin Smith - IBM MQ Service - IBM Rochester
 
 ## Abstract
 
@@ -48,7 +50,7 @@ The command invokes a C program which takes the following steps:
 For example, in Figure 1, the oldest journal entry we need to keep is the "Media Recovery" entry time stamped 13:09:07. (Note that the timestamps used by the program are in the form CYYMMDDHHMMSSmmm, but we will use HH:MM:SS in this example for the sake of simplicity)
 
 ![List of 5 journal receivers ](images/receivers.png)
-<br>_*Figure 1*_
+<br>_Figure 1_
 
 We start our search at the current receiver AMQA0006 which was attached at 16:28:24.  Receivers AMQA0006, AMQA0005, and AMQA0004 are after our timestamp, so we need to keep them. Receiver AMQA0003 was attached at 12:46:49 - before the entry we're looking for - so this is the receiver that contains the oldest journal entry and we need to keep it.  Earlier receivers do not contain any useful information, and can be safely deleted.
 
@@ -93,7 +95,7 @@ CRTCMD  CMD(MQJRNMNT/MQJRNMNT)
 The journal maintenance command (MQJRNMNT) has three parameters. To prompt the command type MQJRNMNT and press F4. Figure 2 shows the options available.
 
 ![alt text](images/MQJRNMNTprompt.jpg)
-<br>_*Figure 2*_
+<br>_Figure 2_
 
 The parameters are :
 
@@ -106,7 +108,7 @@ The parameters are :
 Figure 3 shows a sample of the output when the program is run with OUTPUT(*PRINT) and DLTRCV(*YES). The output shows that eleven receivers are associated with AMQAJRN. The timestamp of the oldest entry is 14:05:35 on 27/05/03. This entry is contained within receiver AMQA000008, so receiver AMQA000007 and earlier receivers can be deleted.
 
 ![alt text](images/Output1.jpg)
-<br>_*Figure 3*_
+<br>_Figure 3_
 
 
 When using MQJRNMNT as part of an automated journal management strategy you should consider periodically recording media images of all your queue manager objects. 
@@ -133,3 +135,4 @@ Once you are satisfied that the command will meet your needs, it can be incorpor
 You can run MQJRNMNT at regular intervals as a scheduled job, or reuse the logic in jrnmaint.c in a Delete Journal Receiver exit program to indicate whether a receiver is eligible for deletion.
 
 
+_**IBM, IBM i, IBM MQ and IBM MQ for IBM i are trademarks of IBM Corporation in the United States, other countries, or both**_
