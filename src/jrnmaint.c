@@ -2,14 +2,26 @@
 /*                                                                         */
 /*  Program name:   JRNMAINT                                               */
 /*  Author:         Mark Phillips                                          */
-/*  Function:       Automate jrn maintenance in WMQ for iSeries v5.?       */
+/*  Function:       Automate jrn maintenance in IBM MQ for IBM i           */
 /*                                                                         */
 /*  Parameters:     argv[1] - char [10] - Queue manager name               */
 /*                  argv[2] - char [6]  - Output type      (*PRINT/*MSGQ)  */
 /*                  argv[3] - char [4]  - Delete receivers (*YES/*NO)      */
 /*                                                                         */
+/* Copyright (c) 2003,2024 IBM Corp.                                       */
 /*                                                                         */
-/*               (c) Copyright IBM Corporation 2003                        */
+/* Licensed under the Apache License, Version 2.0 (the "License");         */
+/* you may not use this file except in compliance with the License.        */
+/* You may obtain a copy of the License at                                 */
+/*                                                                         */
+/*    http://www.apache.org/licenses/LICENSE-2.0                           */
+/*                                                                         */
+/* Unless required by applicable law or agreed to in writing, software     */
+/* distributed under the License is distributed on an "AS IS" BASIS,       */
+/* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.*/
+/* See the License for the specific language governing permissions and     */
+/* limitations under the License.                                          */
+/*                                                                         */
 /***************************************************************************/
 #include <string.h>
 #include <stdlib.h>
