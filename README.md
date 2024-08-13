@@ -62,37 +62,29 @@ Download the source by saving the following links.
 * [jrnmaint.c](src/jrnmaint.c)
 * [mqjrnmaint.cmd](src/mqjrnmnt.cmd)
 
-Log on to your IBM i system, and type the following commands to create a library and source files:
+Log on to your IBM i system, and type the following commands to create a library and directory in your IFS home directory:
 
 ```
 CRTLIB MQJRNMNT
-CRTSRCPF MQJRNMNT/QCSRC
-CRTSRCPF MQJRNMNT/QCMDSRC
+MKDIR DIR('~/mqjrnmnt')
 ```
 
-Transfer the source to your IBM i system. For example to use FTP, type the following commands:
+Transfer the source from your local system to your IBM i system. For example to use OpenSSH secure file copy, type the following commands:
 
 ```
-FTP (IBM i hostname)
--- log on --
-ASCII
-CD MQJRNMNT
-PUT jrnmaint.c QCSRC.JRNMAINT
-PUT mqjrnmaint.cmd QCMDSRC.MQJRNMNT
-QUIT
+scp jrnmaint.c mqjrnmnt.cmd {YOURIBMiHOSTNAME}:~/mqjrnmnt/
 ```
 
 Type the following on the IBM i system to compile the C program and the CL command:
 
 ```
-CRTBNDC MQJRNMNT/JRNMAINT MQJRNMNT/QCSRC
-CRTCMD  CMD(MQJRNMNT/MQJRNMNT)
-        PGM(MQJRNMNT/JRNMAINT)
-        SRCFILE(MQJRNMNT/QCMDSRC)
+CRTBNDC PGM(MQJRNMNT/JRNMAINT) SRCSTMF('mqjrnmnt/jrnmaint.c')
+CRTCMD  CMD(MQJRNMNT/MQJRNMNT) PGM(MQJRNMNT/JRNMAINT)
+        SRCSTMF('mqjrnmnt/mqjrnmnt.cmd')
 ```
 
 ## Invoking the journal maintenance command
-The journal maintenance command (MQJRNMNT) has three parameters. To prompt the command type MQJRNMNT and press F4. Figure 2 shows the options available.
+The journal maintenance command (MQJRNMNT) has three parameters. To prompt the command type `MQJRNMNT/MQJRNMNT` and press F4. Figure 2 shows the options available.
 
 ![alt text](images/MQJRNMNTprompt.jpg)
 <br>_Figure 2_
@@ -101,7 +93,7 @@ The parameters are :
 
 | Parameter | Option |
 | --- | --- |
-| QMGRLIB | Supply the name of the queue manager library. You can determine the name of the queue manager library by looking in the /QIBM/UserData/mqm/mqs.ini file |
+| QMGRLIB | Supply the name of the queue manager library. You can determine the name of the queue manager library by running the `DSPF` command to display the `'/QIBM/UserData/mqm/mqs.ini'` file |
 | OUTPUT | *PRINT - Display output to STDOUT (This is the default)<br>*MSGQ - Send output to queue manager message queue (QMQMMSG in queue manager library) |
 | DLTRCV | *NO - Will execute the program in report mode - no receivers will be deleted (This is the default)<br>*YES - ... Will execute the program in report mode - no receivers will be deleted |
 
