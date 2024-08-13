@@ -4,9 +4,9 @@
 /*  Author:         Mark Phillips                                          */
 /*  Function:       Automate jrn maintenance in IBM MQ for IBM i           */
 /*                                                                         */
-/*  Parameters:     argv[1] - char [10] - Queue manager name               */
-/*                  argv[2] - char [6]  - Output type      (*PRINT/*MSGQ)  */
-/*                  argv[3] - char [4]  - Delete receivers (*YES/*NO)      */
+/*  Parameters:    argv[1] - char [10] - Queue manager name                */
+/*                 argv[2] - char [6]  - Output type     (*PRINT / *MSGQ)  */
+/*                 argv[3] - char [4]  - Delete receivers (*YES / *NO)     */
 /*                                                                         */
 /* Copyright (c) 2003,2024 IBM Corp.                                       */
 /*                                                                         */
