@@ -75,7 +75,7 @@ Transfer the source from your local system to your IBM i system. For example to 
 scp jrnmaint.c mqjrnmnt.cmd {YOURIBMiHOSTNAME}:~/mqjrnmnt/
 ```
 
-Type the following on the IBM i system to compile the C program and the CL command (note that the command uses a relative path to the source in IFS.  Alter this path if you stored the source somewhere else, or if your current IFS directory is different to your home direectory):
+Type the following on the IBM i system to compile the C program and the CL command (note that the commands uses relative paths to the source in IFS.  Alter these paths if you stored the source somewhere else, or if your current IFS directory is different to your home directory):
 
 ```
 CRTBNDC PGM(MQJRNMNT/JRNMAINT) SRCSTMF('mqjrnmnt/jrnmaint.c')
